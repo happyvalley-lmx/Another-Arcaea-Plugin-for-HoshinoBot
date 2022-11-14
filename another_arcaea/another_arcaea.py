@@ -63,12 +63,14 @@ async def arc_b30(bot, ev: CQEvent):
             req_status = req_data_json['status']
             if req_status == 0:
                 username = req_data_json['content']['account_info']['name']
-                ptt = math.floor((req_data_json['content']['best30_avg'] + req_data_json['content']['recent10_avg']) / 2 * 100) / 100
+                ptt = req_data_json['content']['account_info']['rating'] / 100
+                b30_avg_ptt = math.floor(req_data_json['content']['best30_avg'] * 1000) / 1000
+                r10_avg_ptt = math.floor(req_data_json['content']['recent10_avg'] * 1000) / 1000
 
                 image = Image.new('RGB', (800, 1000), (0,0,0)) # 设置画布大小及背景色
                 draw = ImageDraw.Draw(image)
                 font_main = ImageFont.truetype(nowdir + '\\hoshino\\modules\\another_arcaea\\NotoSansSC-Regular.otf', 30)
-                draw.text((10, 5), f'{username}     PTT:{ptt}', 'white', font_main)
+                draw.text((10, 5), f'{username}     PTT:{ptt}(B30/R10:{b30_avg_ptt}/{r10_avg_ptt})', 'white', font_main)
                 
                 font = ImageFont.truetype(nowdir + '\\hoshino\\modules\\another_arcaea\\NotoSansSC-Regular.otf', 20) # 设置字体及字号
                 fontx = 10

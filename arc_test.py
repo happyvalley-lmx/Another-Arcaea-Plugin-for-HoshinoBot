@@ -6,22 +6,23 @@ from another_arcaea.config.apiconfig import api_link,token
 from PIL import Image, ImageFont, ImageDraw
 
 nowdir = os.getcwd()
-print(nowdir)
-api_token = '&token=' + token
+
+headers = {"Authorization":"Bearer "+ token}
 
 def b30():
     user_id = input('输入用户ID:')
-    request_link = api_link + '/user/best30?user=' + user_id + '&withrecent=true&withsonginfo=true' + api_token
-    req_data = requests.get(request_link)
+    request_link = api_link + '/user/best30?user=' + user_id + '&withrecent=true&withsonginfo=true'
+    req_data = requests.get(request_link, headers=headers)
     req_data_json = json.loads(req_data.content)
     username = req_data_json['content']['account_info']['name']
-    ptt = math.floor((req_data_json['content']['best30_avg'] + req_data_json['content']['recent10_avg']) / 2 * 100) / 100
-    print(ptt)
+    ptt = req_data_json['content']['account_info']['rating'] / 100
+    b30_avg_ptt = math.floor(req_data_json['content']['best30_avg'] * 1000) / 1000
+    r10_avg_ptt = math.floor(req_data_json['content']['recent10_avg'] * 1000) / 1000
 
     image = Image.new('RGB', (800, 1000), (0,0,0)) # 设置画布大小及背景色
     draw = ImageDraw.Draw(image)
     font_main = ImageFont.truetype(nowdir + '\\another_arcaea\\NotoSansSC-Regular.otf', 30)
-    draw.text((10, 5), f'{username}     PTT:{ptt}', 'white', font_main)
+    draw.text((10, 5), f'{username}     PTT:{ptt}(B30/R10:{b30_avg_ptt}/{r10_avg_ptt})', 'white', font_main)
     
     font = ImageFont.truetype(nowdir + '\\another_arcaea\\NotoSansSC-Regular.otf', 20) # 设置字体及字号
     fontx = 10
