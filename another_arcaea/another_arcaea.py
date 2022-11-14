@@ -54,7 +54,7 @@ async def arc_b30(bot, ev: CQEvent):
         if not result_cx:
             await bot.send(ev, "无法查询到您的数据，请检查是否通过签到功能注册bot功能", at_sender = True)
         elif result_cx[0][1] == None:
-            await bot.send(ev, "您还没有绑定您的SDVX ID，请联系管理员绑定", at_sender = True)
+            await bot.send(ev, "您还没有绑定您的 Arcaea ID，请先使用绑定功能进行绑定", at_sender = True)
         else:
             user_id = str(result_cx[0][1])
             request_link = api_link + '/user/best30?user=' + user_id + '&withrecent=true&withsonginfo=true'
@@ -151,6 +151,6 @@ async def arc_bind(bot, ev: CQEvent):
                 await bot.send(ev, f'查询过程中发生错误:{e}')
             db_bot.close()
         else:
-            await bot.send(ev, '请输入有效的Arcaea好友码范围(0~999999999)')
+            await bot.send(ev, '请输入有效的 Arcaea ID 范围(0~999999999)')
     else:
-        await bot.send(ev, '请输入纯数字的Arcaea好友码')
+        await bot.send(ev, '请输入纯数字的Arcaea ID')
