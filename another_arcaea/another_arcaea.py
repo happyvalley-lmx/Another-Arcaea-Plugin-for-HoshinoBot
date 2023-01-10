@@ -58,54 +58,57 @@ async def arc_b30(bot, ev: CQEvent):
         else:
             user_id = str(result_cx[0][1])
             request_link = api_link + '/user/best30?user=' + user_id + '&withrecent=true&withsonginfo=true'
-            req_data = requests.get(request_link, headers=headers)
-            req_data_json = json.loads(req_data.content)
-            req_status = req_data_json['status']
-            if req_status == 0:
-                username = req_data_json['content']['account_info']['name']
-                ptt = req_data_json['content']['account_info']['rating'] / 100
-                b30_avg_ptt = math.floor(req_data_json['content']['best30_avg'] * 1000) / 1000
-                r10_avg_ptt = math.floor(req_data_json['content']['recent10_avg'] * 1000) / 1000
+            try:
+                req_data = requests.get(request_link, headers=headers, timeout=10)
+                req_data_json = json.loads(req_data.content)
+                req_status = req_data_json['status']
+                if req_status == 0:
+                    username = req_data_json['content']['account_info']['name']
+                    ptt = req_data_json['content']['account_info']['rating'] / 100
+                    b30_avg_ptt = math.floor(req_data_json['content']['best30_avg'] * 1000) / 1000
+                    r10_avg_ptt = math.floor(req_data_json['content']['recent10_avg'] * 1000) / 1000
 
-                image = Image.new('RGB', (800, 1000), (0,0,0)) # 设置画布大小及背景色
-                draw = ImageDraw.Draw(image)
-                font_main = ImageFont.truetype(nowdir + '\\hoshino\\modules\\another_arcaea\\NotoSansSC-Regular.otf', 30)
-                draw.text((10, 5), f'{username}     PTT:{ptt}(B30/R10:{b30_avg_ptt}/{r10_avg_ptt})', 'white', font_main)
-                
-                font = ImageFont.truetype(nowdir + '\\hoshino\\modules\\another_arcaea\\NotoSansSC-Regular.otf', 20) # 设置字体及字号
-                fontx = 10
-                draw.text((fontx, 50), f'单曲PTT|难度|定数|分数|乐曲名称', 'white', font)
-                fonty = 80
-                i = 0
-                for b30_single in req_data_json['content']['best30_list']:
-                    rating = math.floor(b30_single['rating'] * 100) / 100
-                    diff_raw = b30_single['difficulty']
-                    if diff_raw == 3:
-                        diff = 'BYD'
-                    elif diff_raw == 2:
-                        diff = 'FTR'
-                    elif diff_raw == 1:
-                        diff = 'PRS'
-                    else:
-                        diff = 'PST'
-                    rating_ori = req_data_json['content']['best30_songinfo'][i]['rating'] / 10
-                    score = b30_single['score']
-                    s_name = req_data_json['content']['best30_songinfo'][i]['name_en']
+                    image = Image.new('RGB', (800, 1000), (0,0,0)) # 设置画布大小及背景色
+                    draw = ImageDraw.Draw(image)
+                    font_main = ImageFont.truetype(nowdir + '\\hoshino\\modules\\another_arcaea\\NotoSansSC-Regular.otf', 30)
+                    draw.text((10, 5), f'{username}     PTT:{ptt}(B30/R10:{b30_avg_ptt}/{r10_avg_ptt})', 'white', font_main)
+                    
+                    font = ImageFont.truetype(nowdir + '\\hoshino\\modules\\another_arcaea\\NotoSansSC-Regular.otf', 20) # 设置字体及字号
+                    fontx = 10
+                    draw.text((fontx, 50), f'单曲PTT|难度|定数|分数|乐曲名称', 'white', font)
+                    fonty = 80
+                    i = 0
+                    for b30_single in req_data_json['content']['best30_list']:
+                        rating = math.floor(b30_single['rating'] * 100) / 100
+                        diff_raw = b30_single['difficulty']
+                        if diff_raw == 3:
+                            diff = 'BYD'
+                        elif diff_raw == 2:
+                            diff = 'FTR'
+                        elif diff_raw == 1:
+                            diff = 'PRS'
+                        else:
+                            diff = 'PST'
+                        rating_ori = req_data_json['content']['best30_songinfo'][i]['rating'] / 10
+                        score = b30_single['score']
+                        s_name = req_data_json['content']['best30_songinfo'][i]['name_en']
 
-                    draw.text((fontx, fonty), f'No.{i+1}:[{rating}|{diff}|{rating_ori}|{score}] {s_name}', 'white', font)
-                    fonty = fonty + 30
-                    i += 1
-                
-                image.save(nowdir + f'\\hoshino\\modules\\another_arcaea\\b30_pic\\{user_id}.jpg') # 保存图片
-                data = open(nowdir + f'\\hoshino\\modules\\another_arcaea\\b30_pic\\{user_id}.jpg', "rb")
-                base64_str = base64.b64encode(data.read())
-                img_b64 =  b'base64://' + base64_str
-                img_b64 = str(img_b64, encoding = "utf-8")  
-                await bot.send(ev, f'[CQ:image,file={img_b64}]')
-            else:
-                await bot.send(ev, f'查询结果错误，API返回状态码:{req_status}')
+                        draw.text((fontx, fonty), f'No.{i+1}:[{rating}|{diff}|{rating_ori}|{score}] {s_name}', 'white', font)
+                        fonty = fonty + 30
+                        i += 1
+                    
+                    image.save(nowdir + f'\\hoshino\\modules\\another_arcaea\\b30_pic\\{user_id}.jpg') # 保存图片
+                    data = open(nowdir + f'\\hoshino\\modules\\another_arcaea\\b30_pic\\{user_id}.jpg', "rb")
+                    base64_str = base64.b64encode(data.read())
+                    img_b64 =  b'base64://' + base64_str
+                    img_b64 = str(img_b64, encoding = "utf-8")  
+                    await bot.send(ev, f'[CQ:image,file={img_b64}]')
+                else:
+                    await bot.send(ev, f'查询结果错误，API返回状态码:{req_status}')
+            except requests.exceptions.RequestException as e:
+                await bot.send(ev, f'查询请求过程中发生错误:{e}')
     except:
-        await bot.send(ev, '查询过程中发生错误')
+        await bot.send(ev, '查询过程中发生未知错误')
     db_use.close()
 
 @sv.on_prefix(('/arc bind'))
