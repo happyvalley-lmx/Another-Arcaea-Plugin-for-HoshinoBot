@@ -21,10 +21,10 @@ def b30():
 
     image = Image.new('RGB', (800, 1000), (0,0,0)) # 设置画布大小及背景色
     draw = ImageDraw.Draw(image)
-    font_main = ImageFont.truetype(nowdir + '\\another_arcaea\\NotoSansSC-Regular.otf', 30)
+    font_main = ImageFont.truetype(nowdir + '/another_arcaea/NotoSansSC-Regular.otf', 30)
     draw.text((10, 5), f'{username}     PTT:{ptt}(B30/R10:{b30_avg_ptt}/{r10_avg_ptt})', 'white', font_main)
     
-    font = ImageFont.truetype(nowdir + '\\another_arcaea\\NotoSansSC-Regular.otf', 20) # 设置字体及字号
+    font = ImageFont.truetype(nowdir + '/another_arcaea/NotoSansSC-Regular.otf', 20) # 设置字体及字号
     fontx = 10
     draw.text((fontx, 50), f'单曲PTT|难度|定数|分数|乐曲名称', 'white', font)
     fonty = 80
@@ -48,6 +48,6 @@ def b30():
         fonty = fonty + 30
         i += 1
     
-    image.save(f'b30_pic\\{user_id}.jpg') # 保存图片
+    image.save(nowdir + f'/b30_pic/{user_id}.jpg') # 保存图片
 
 b30()
